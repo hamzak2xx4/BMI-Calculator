@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMI Calculator ⚖️</title>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #74ABE2, #5563DE);
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        background: white;
+        padding: 30px 40px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        width: 330px;
+        text-align: center;
+        animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+        from {opacity: 0; transform: translateY(30px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    input {
+        width: 90%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        font-size: 16px;
+        outline: none;
+        transition: 0.3s;
+    }
+
+    input:focus {
+        border-color: #5563DE;
+    }
+
+    button {
+        width: 95%;
+        padding: 10px;
+        background: #5563DE;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #3c48b2;
+    }
+
+    .result {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .quote {
+        margin-top: 10px;
+        font-style: italic;
+        color: #555;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>💪 BMI Calculator</h2>
+    <input type="number" id="weight" placeholder="Enter weight (kg)">
+    <input type="number" id="height" placeholder="Enter height (cm)">
+    <button onclick="calculateBMI()">Check BMI</button>
+
+    <div class="result" id="result"></div>
+    <div class="quote" id="quote"></div>
+</div>
+
+<script>
+function calculateBMI() {
+    let weight = document.getElementById("weight").value;
+    let height = document.getElementById("height").value;
+
+    if (weight === "" || height === "") {
+        document.getElementById("result").innerHTML = "⚠️ Please enter both weight and height.";
+        document.getElementById("quote").innerHTML = "";
+        return;
+    }
+
+    height = height / 100; // convert cm to meters
+    let bmi = (weight / (height * height)).toFixed(2);
+    let message = "";
+    let quote = "";
+
+    if (bmi < 18.5) {
+        message = `Your BMI is ${bmi} (Underweight)`;
+        quote = "Eat more, lift heavy, and grow strong! 💪";
+    } else if (bmi >= 18.5 && bmi < 24.9) {
+        message = `Your BMI is ${bmi} (Fit & Healthy)`;
+        quote = "Perfect balance! Keep maintaining your lifestyle 🌟";
+    } else if (bmi >= 25 && bmi < 29.9) {
+        message = `Your BMI is ${bmi} (Overweight)`;
+        quote = "A little focus on fitness can bring amazing results! 🏃‍♂️";
+    } else {
+        message = `Your BMI is ${bmi} (Obese)`;
+        quote = "Start today — every step counts toward a healthier you ❤️";
+    }
+
+    document.getElementById("result").innerHTML = message;
+    document.getElementById("quote").innerHTML = quote;
+}
+</script>
+
+</body>
+</html>
