@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for the app */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom transition for smoother UI updates */
+        #result-container {
+            transition: all 0.3s ease-in-out;
+        }
+        /* Style for input number spinners */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 via-blue-500 to-black-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main calculator card -->
+    <div class="w-full max-w-md bg-white/70 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8">
+        
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center gap-3">
+                <!-- Health Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                <h1 class="text-3xl font-bold text-slate-800">BMI Calculator</h1>
+            </div>
+            <p class="text-slate-500 mt-2">Calculate your Body Mass Index</p>
+        </div>
+
+        <!-- Input form -->
+        <form id="bmi-form" class="space-y-6">
+            <!-- Height Input -->
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-2">Height</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="relative">
+                            <input type="number" id="height-ft" placeholder="Feet" class="w-full pl-4 pr-12 py-3 bg-white/80 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500">ft</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="relative">
+                            <input type="number" id="height-in" placeholder="Inches" class="w-full pl-4 pr-12 py-3 bg-white/80 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500">in</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weight Input -->
+            <div>
+                <label for="weight" class="block text-sm font-medium text-slate-600 mb-2">Weight</label>
+                <div class="relative">
+                     <input type="number" id="weight" placeholder="Kilograms" class="w-full pl-4 pr-12 py-3 bg-white/80 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                     <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500">kg</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105 shadow-lg shadow-indigo-200">
+                    Calculate BMI
+                </button>
+                <button type="button" id="clear-btn" class="w-full bg-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-lg hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition">
+                    Clear
+                </button>
+            </div>
+        </form>
+
+        <!-- Result Display Area -->
+        <div id="result-container" class="mt-8 text-center opacity-0 scale-95">
+            <p class="text-slate-600 text-lg">Your BMI is</p>
+            <p id="bmi-value" class="text-5xl font-bold my-2 text-slate-800"></p>
+            <p id="bmi-category" class="text-xl font-semibold px-4 py-2 rounded-full inline-block"></p>
+            <p id="motivational-remark" class="text-slate-600 mt-4 text-sm italic"></p>
+        </div>
+
+    </div>
+
+    <script>
+        const bmiForm = document.getElementById('bmi-form');
+        const clearBtn = document.getElementById('clear-btn');
+        const resultContainer = document.getElementById('result-container');
+        const bmiValueEl = document.getElementById('bmi-value');
+        const bmiCategoryEl = document.getElementById('bmi-category');
+        const motivationalRemarkEl = document.getElementById('motivational-remark');
+
+
+        /**
+         * Calculates the BMI and updates the UI with the result.
+         * @param {Event} e - The form submission event.
+         */
+        const calculateBmi = (e) => {
+            e.preventDefault();
+
+            const heightFt = parseFloat(document.getElementById('height-ft').value);
+            const heightIn = parseFloat(document.getElementById('height-in').value) || 0;
+            const weightKg = parseFloat(document.getElementById('weight').value);
+
+            // --- Input Validation ---
+            if (isNaN(heightFt) || isNaN(weightKg) || heightFt <= 0 || weightKg <= 0) {
+                displayError("Please enter a valid height and weight.");
+                return;
+            }
+
+            // --- Calculation ---
+            const totalInches = (heightFt * 12) + heightIn;
+            const heightMeters = totalInches * 0.0254;
+            const bmi = weightKg / (heightMeters * heightMeters);
+            const bmiRounded = bmi.toFixed(1);
+
+            // --- Determine BMI Category and Remark ---
+            const { category, colorClass } = getBmiCategory(bmi);
+            const remark = getMotivationalRemark(category);
+
+            // --- Display Result ---
+            displayResult(bmiRounded, category, colorClass, remark);
+        };
+
+        /**
+         * Determines the BMI category and corresponding color class.
+         * @param {number} bmi - The calculated BMI value.
+         * @returns {object} An object containing the category name and Tailwind CSS color class.
+         */
+        const getBmiCategory = (bmi) => {
+            if (bmi < 18.5) {
+                return { category: "Underweight", colorClass: "bg-yellow-100 text-yellow-800" };
+            } else if (bmi >= 18.5 && bmi <= 24.9) {
+                return { category: "Normal weight", colorClass: "bg-green-100 text-green-800" };
+            } else if (bmi >= 25 && bmi <= 29.9) {
+                return { category: "Overweight", colorClass: "bg-orange-100 text-orange-800" };
+            } else {
+                return { category: "Obesity", colorClass: "bg-red-100 text-red-800" };
+            }
+        };
+
+        /**
+         * Returns a motivational remark based on the BMI category.
+         * @param {string} category - The BMI category.
+         * @returns {string} The motivational remark.
+         */
+        const getMotivationalRemark = (category) => {
+            switch(category) {
+                case "Underweight":
+                    return "A balanced diet can help you reach a healthier weight. You've got this!";
+                case "Normal weight":
+                    return "Great job maintaining a healthy weight! Keep up the balanced lifestyle.";
+                case "Overweight":
+                    return "Every step towards a healthier lifestyle is a victory. Stay consistent!";
+                case "Obesity":
+                    return "Your health journey is a marathon, not a sprint. Small, positive changes lead to big results.";
+                default:
+                    return "";
+            }
+        };
+
+        /**
+         * Displays the BMI result in the UI.
+         * @param {string} value - The rounded BMI value.
+         * @param {string} category - The BMI category text.
+         * @param {string} colorClass - The Tailwind CSS classes for styling the category.
+         * @param {string} remark - The motivational message.
+         */
+        const displayResult = (value, category, colorClass, remark) => {
+            bmiValueEl.textContent = value;
+            bmiCategoryEl.textContent = category;
+            motivationalRemarkEl.textContent = `"${remark}"`;
+            
+            // Reset color classes before applying the new one
+            bmiCategoryEl.className = 'text-xl font-semibold px-4 py-2 rounded-full inline-block';
+            bmiCategoryEl.classList.add(...colorClass.split(' '));
+            
+            // Make the result visible with an animation
+            resultContainer.classList.remove('opacity-0', 'scale-95');
+        };
+
+        /**
+         * Displays an error message in the result area.
+         * @param {string} message - The error message to display.
+         */
+        const displayError = (message) => {
+            bmiValueEl.textContent = 'Oops!';
+            bmiCategoryEl.textContent = message;
+            motivationalRemarkEl.textContent = ''; // Clear remark on error
+
+            bmiCategoryEl.className = 'text-xl font-semibold px-4 py-2 rounded-full inline-block';
+            bmiCategoryEl.classList.add('bg-red-100', 'text-red-800');
+
+            resultContainer.classList.remove('opacity-0', 'scale-95');
+        };
+
+        /**
+         * Clears all inputs and hides the result.
+         */
+        const clearForm = () => {
+            bmiForm.reset();
+            resultContainer.classList.add('opacity-0', 'scale-95');
+        };
+
+        // --- Event Listeners ---
+        bmiForm.addEventListener('submit', calculateBmi);
+        clearBtn.addEventListener('click', clearForm);
+
+    </script>
+
+</body>
+</html>
